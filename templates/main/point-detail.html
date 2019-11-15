@@ -10,10 +10,20 @@
 <div>
     <div id="mapa">{% leaflet_map "main" callback="map_init" %}</div>
     <div id="desc">
-        <div id="header">Outlet żywności</div>
-        <div id="title">Tytuł</div>
-        <div id="descd">desc</div>
-        <div id="telephone">{{ tab.0.1 }}</div>
+        <form action="{% url 'add-point-detail' %}" method="post">
+            {% csrf_token %}
+            <div id="header">Outlet żywności</div>
+            <div id="title">Tytuł</div>
+            <div id="i1" class="input" style="width: min-content; margin-left:auto; margin-right:auto;"><input name="title"/></div>
+            <div id="descd">desc</div>
+            <div id="i2" class="input" style="width: min-content; margin-left:auto; margin-right:auto;"><input name="description"/></div>
+            <div id="telephone">{{ tab.0.1 }}</div>
+            <div id="telephone2"></div>
+            <div id="i3" class="input"  style="width: min-content; margin-left:auto; margin-right:auto;"><input name="telephone"/></div><br/>
+            <div id="i4" class="input" style="width: min-content; margin-left:auto; margin-right:auto;"><input type="submit" value="DODAJ"></div>
+            <input type="hidden" name="lat" id="lat"/>
+            <input type="hidden" name="lng" id="lng"/>
+        </form>
 <div id="opis">Autorzy:<br>
         Paweł Dopierała<br>
         Bartosz Adamczyk<br>
@@ -43,6 +53,12 @@
         document.getElementById("title").innerText = this.options.name;
         document.getElementById("descd").innerText = this.options.desc;
         document.getElementById("telephone").innerText = this.options.tel;
+        document.getElementById("i1").style.display = "none";
+        document.getElementById("i2").style.display = "none";
+        document.getElementById("i3").style.display = "none";
+        document.getElementById("i4").style.display = "none";
+        document.getElementById("telephone2").style.display = "none";
+        document.getElementById("telephone").style.display = "inherit";
     }
 
     function map_init(map, options) {
@@ -58,6 +74,55 @@
                 tel: "{{ d.5 }}"
             }).addTo(map).on('mousedown', onClick);
         {% endfor %}
+        var popup = L.popup()
+
+        function onMapClick(e) {
+
+            popup
+                .setLatLng(e.latlng)
+                .setContent("<a href='javascript:my_function(`"+ e.latlng.toString() +"`);'>Dodaj</a>")
+                .openOn(map);
+        }
+
+        map.on('click', onMapClick);
     }
+
+    function my_function(latlng) {
+        if (!foo) {
+            foo = true;
+            document.getElementById("desc").style.width = "25%";
+            document.getElementById("desc").style.paddingRight = "10px";
+            document.getElementById("desc").style.paddingLeft = "10px";
+
+            document.getElementById("mapa").style.width = "75%";
+            document.getElementById("title").style.overflow = "";
+            document.getElementById("descd").style.overflow = "";
+            document.getElementById("telephone").style.overflow = "";
+            document.getElementById("telephone").style.display = "block";
+
+            document.getElementById("header").style.overflow = "";
+        }
+
+        document.getElementById("title").innerText = "Tytuł";
+        document.getElementById("descd").innerText = "Opis";
+        document.getElementById("telephone2").innerText = "Numer telefonu";
+        document.getElementById("i1").style.display = "inherit";
+        document.getElementById("i2").style.display = "inherit";
+        document.getElementById("i3").style.display = "inherit";
+        document.getElementById("i4").style.display = "inherit";
+        document.getElementById("telephone").style.display = "none";
+        document.getElementById("telephone2").style.display = "inherit";
+        var str = latlng;
+        var array = str.split("(");
+        var array = array[1].split(",");
+        var lng = array[1].split(")");
+
+        document.getElementById("lat").value=array[0];
+        document.getElementById("lng").value=lng[0];
+
+    }
+
+
+
 </script>
 </html>

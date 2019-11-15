@@ -23,5 +23,6 @@ from mapa import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url('', views.PointDetail),
+    path('', views.PointDetail),
+    path('add-point-detail/', views.addPointDetail, name='add-point-detail'),
 ]
